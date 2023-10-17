@@ -1,5 +1,6 @@
 clc;
 clearvars;
+warning('off','MATLAB:polyshape:repairedBySimplify');
 rrtvariables;
 load("FieldConst.mat");
 Dimensions.Length = Length;
@@ -19,7 +20,7 @@ tic;
 RRTState = GRRTSTAR1(RRTState);
 % RRTState = getpath(RRTState);
 elapsedTime = toc;
-filename = ['G_RRT_STAR' num2str(i) '.jpg'];
+filename = ['G_RRT_STAR' num2str(i) '.fig'];
 saveas(1,filename)
 Dist(i) = RRTState.Final.dist_total;
 Iterations(i) = RRTState.Final.Iterations;
@@ -28,7 +29,7 @@ tic;
 Rover = roverinit(RRTState);
 Rover = losapnav(Rover);
 elapsedTime = toc;
-filename = ['GRRT_RoverLoS' num2str(i) '.jpg'];
+filename = ['GRRT_RoverLoS' num2str(i) '.fig'];
 saveas(1,filename)
 time2(i) = elapsedTime;
 disp(['Iteration Completed:',num2str(i)])
@@ -49,8 +50,8 @@ disp(['Average time taken :',num2str(Avg_time1)])
 disp(['Time taken by the Rover:',num2str(Avg_time2)])
 disp(['Distance covered by the Rover:',num2str(Avg_dist2)])
 %%
-openfig('G_RRT_STAR1')
-openfig('GRRT_RoverLoS1')
+openfig('G_RRT_STAR1.fig');
+openfig('GRRT_RoverLoS1.fig');
 
 
 
