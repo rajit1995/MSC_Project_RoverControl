@@ -1,7 +1,9 @@
 function RRTState = rrtstateinit(pointA,pointB,Dimensions,Obstacles)
     RRTState.PointA = pointA;
     RRTState.PointB = pointB;
-    
+    RRTState.Rover.Length = 0.35;
+    RRTState.Rover.Width = 0.2488;
+    RRTState.Rover.Radius = 0.5*norm([RRTState.Rover.Length RRTState.Rover.Width]);
     RRTState.Dimensions = Dimensions;
     RRTState.Obstacles = Obstacles;
     RRTState.q_near_count = 0;
@@ -17,7 +19,7 @@ function RRTState = rrtstateinit(pointA,pointB,Dimensions,Obstacles)
         RRTState.Branches1(1,:) = [1,1,0];
     RRTState.pathvertices(1,:) = [pointA,0];
     RRTState.StepSize =0.5;
-    RRTState.Threshold = 1 ;
+    RRTState.Threshold = RRTState.StepSize ;
     %RRTState.neighborhoodRadius = 25;
     % theta = 36;
     %         theta_rad = theta*pi/180;
@@ -36,18 +38,18 @@ function RRTState = rrtstateinit(pointA,pointB,Dimensions,Obstacles)
     for i = 1:RRTState.Obstacles.Number
     for j = 1 : size(RRTState.Obstacles.X(i,:),2)
            if RRTState.Obstacles.X(i,j) < RRTState.Obstacles.Centers(i,1)
-               RRTState.Obstacles.X1(i,j) = RRTState.Obstacles.X(i,j)-0.2;
+               RRTState.Obstacles.X1(i,j) = RRTState.Obstacles.X(i,j)-RRTState.Rover.Radius;
            elseif RRTState.Obstacles.X(i,j) > RRTState.Obstacles.Centers(i,1)
-               RRTState.Obstacles.X1(i,j) = RRTState.Obstacles.X(i,j)+0.2;
+               RRTState.Obstacles.X1(i,j) = RRTState.Obstacles.X(i,j)+RRTState.Rover.Radius;
            else
                RRTState.Obstacles.X1(i,j) = RRTState.Obstacles.X(i,j);
            end
     end
         for j = 1 : size(RRTState.Obstacles.Y(i,:),2)
            if RRTState.Obstacles.Y(i,j) < RRTState.Obstacles.Centers(i,2)
-               RRTState.Obstacles.Y1(i,j) = RRTState.Obstacles.Y(i,j)-0.2;
-           elseif RRTState.Obstacles.Y(i,j) > RRTState.Obstacles.Centers(i,1)
-               RRTState.Obstacles.Y1(i,j) = RRTState.Obstacles.Y(i,j)+0.2;
+               RRTState.Obstacles.Y1(i,j) = RRTState.Obstacles.Y(i,j)-RRTState.Rover.Radius;
+           elseif RRTState.Obstacles.Y(i,j) > RRTState.Obstacles.Centers(i,2)
+               RRTState.Obstacles.Y1(i,j) = RRTState.Obstacles.Y(i,j)+RRTState.Rover.Radius;
            else
                RRTState.Obstacles.Y1(i,j) = RRTState.Obstacles.Y(i,j);
            end
