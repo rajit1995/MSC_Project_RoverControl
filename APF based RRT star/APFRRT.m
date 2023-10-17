@@ -1,5 +1,5 @@
 function RRTState = APFRRT(RRTState)
-    r_near =5;
+    r_near =RRTState.StepSize;
     K_att = 3;
     K_epd = 2;
     K_rep = 2;
@@ -43,7 +43,9 @@ function RRTState = APFRRT(RRTState)
         F_rep = 0;
         for i = 1:RRTState.Obstacles.Number
             e_vn = (RRTState.q_new -[RRTState.Obstacles.Centers(i)]) /norm (RRTState.q_new - [RRTState.Obstacles.Centers(i)] );
-            if norm(RRTState.Obstacles.Centers(i,:) - RRTState.q_new) <= RRTState.Obstacles.radius_max(i)+0.5
+            [d,~,~] = p_poly_dist(RRTState.q_new(:,1),RRTState.q_new(:,2), RRTState.Obstacles.X1(i,:), RRTState.Obstacles.Y1(i,:)); 
+            if d <= RRTState.Rover.Radius+0.1
+            % if norm(RRTState.Obstacles.Centers(i,:) - RRTState.q_new) <= RRTState.Obstacles.radius_max(i)+0.5
                 F_rep = F_rep + K_rep*e_vn;
             else 
                 F_rep = F_rep + 0 ;
@@ -97,9 +99,9 @@ function RRTState = APFRRT(RRTState)
         end
 
         q_near_bkp=RRTState.q_near;
-        if RRTState.StepSize ~= 5  
+        if RRTState.StepSize ~= 2  
             RRTState = getqnear(RRTState);
-        elseif RRTState.StepSize == 5 && RRTState.q_near_count < 10
+        elseif RRTState.StepSize == 2 && RRTState.q_near_count < 15
              RRTState.q_near = RRTState.pathvertices(length(RRTState.pathvertices),1:2);
         else
             RRTState.q_near = RRTState.pathvertices(length(RRTState.pathvertices)-1,1:2);
@@ -114,8 +116,8 @@ function RRTState = APFRRT(RRTState)
             RRTState.q_near_count = 0;
         end
 
-         if RRTState.q_near_count > 5 
-                RRTState.StepSize = 5;
+         if RRTState.q_near_count > 10 
+                RRTState.StepSize = 2;
                
         else
             RRTState.StepSize = 0.5;

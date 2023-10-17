@@ -7,16 +7,24 @@ function Rover = losapnav(Rover)
     while Rover.wpacc_ind ~=1
 
         Rover.counter = Rover.counter+1;
+      
       if i==size(Rover.waypoints,1)
-          Rover.RadiusAcc = 0.01;
+          Rover.RadiusAcc = 0.1;
           if norm(Rover.pos_curr - Rover.next_wayPoint) >= Rover.n*(Rover.Length+Rover.Radius)
               Rover.LoSRadius = Rover.LoSRadius;
           else
               Rover.LoSRadius = norm(Rover.pos_curr - Rover.next_wayPoint);
           end
       else
-          Rover.RadiusAcc = norm(Rover.prev_wayPoint-Rover.next_wayPoint)*0.5;
-          % Rover.RadiusAcc = 0.4;
+          if Rover.waypoints(i,3) > 0
+              if norm(Rover.prev_wayPoint-Rover.next_wayPoint) <= Rover.StepSize
+                  Rover.RadiusAcc = norm(Rover.prev_wayPoint-Rover.next_wayPoint);
+              else
+                  Rover.RadiusAcc = norm(Rover.prev_wayPoint-Rover.next_wayPoint)*0.2;
+              end
+          else 
+              Rover.RadiusAcc = norm(Rover.prev_wayPoint-Rover.next_wayPoint)*0.5;
+          end
 
       end
       
@@ -40,15 +48,12 @@ function Rover = losapnav(Rover)
         else 
             Rover.pos_des = Rover.next_wayPoint;
         end
-       
-        % norma = norm(Rover.pos_curr - Rover.next_wayPoint);
+        if norm(Rover.pos_des_1 - Rover.next_wayPoint) < norm(Rover.pos_des - Rover.next_wayPoint)  && Rover.obstactalert ~=1
+            Rover.pos_des = Rover.next_wayPoint;
+        end
+     
         if norm(Rover.pos_curr - Rover.next_wayPoint) <= Rover.RadiusAcc 
              Rover.wpacc_ind = 1;
-        % elseif norm(Rover.pos_des_1 - Rover.next_wayPoint) < norm(Rover.pos_des - Rover.next_wayPoint) && i~= size(Rover.waypoints,1) && Rover.obstactalert ~= 1
-        % 
-        %         Rover.wpacc_ind = 1;
-        % 
-        
         else
              Rover.wpacc_ind = 0;
              
@@ -56,13 +61,30 @@ function Rover = losapnav(Rover)
          Rover.e_u = Rover.pos_des - Rover.pos_curr;
         
          Rover.u_sur = Rover.Kpu*Rover.e_u + Rover.Kiu*(Rover.e_u+Rover.e_u_1)*Rover.dt/2 + Rover.kdu*(Rover.e_u - Rover.e_u_1)/Rover.dt;
+         % u_sur_bkp = Rover.u_sur;
+         % head_angle = acos(sum(Rover.u_sur.*Rover.u_sur_1)/(norm(Rover.u_sur)*norm(Rover.u_sur_1)));
+         % if head_angle > pi/3 && Rover.obstactalert ~= 1
+         %     head_angle_new1 = -1*head_angle;
+         % 
+         %     Rover.u_sur1 =  transpose([cos(head_angle_new1) -sin(head_angle_new1);sin(head_angle_new1) cos(head_angle_new1)]*transpose(Rover.u_sur));
+         %     if head_angle <0 
+         %         head_angle_new = -pi/12;
+         %     else 
+         %        head_angle_new = pi/12;
+         %     end
+         %     Rover.u_sur = transpose([cos(head_angle_new) -sin(head_angle_new);sin(head_angle_new) cos(head_angle_new)]*transpose(Rover.u_sur1));
+         % else
+         %    Rover.u_sur = u_sur_bkp;
+         % end
+
+
         Rover.a = (Rover.u_sur - Rover.u_sur_1)/Rover.dt;
          Rover.disp = Rover.u_sur_1*Rover.dt + 0.5*Rover.a*Rover.dt*Rover.dt;
          Rover = obstacledetect(Rover) ;
-         Rover.obst =  [Rover.obst;Rover.poly_ind];
-        Rover.pos_curr = Rover.pos_curr + Rover.disp;
-        % pos_curr = Rover.pos_curr;
-        Rover.Travel = [Rover.Travel;Rover.pos_curr];
+        %  Rover.obst =  [Rover.obst;Rover.poly_ind];
+        % Rover.pos_curr = Rover.pos_curr + Rover.disp;
+        % % pos_curr = Rover.pos_curr;
+        % Rover.Travel = [Rover.Travel;Rover.pos_curr];
          Rover.e_u_1 = Rover.e_u;
          Rover.u_sur_1 = Rover.u_sur;
          Rover.pos_des_1 =Rover.pos_des;
@@ -73,7 +95,7 @@ function Rover = losapnav(Rover)
        Rover.wpacc_ind = 0;
     
   end
-  disp(['Reached']);
+  disp('Reached');
     Rover.dist1 = hypot(diff(Rover.Travel(:,1)), diff(Rover.Travel(:,2)))  ;  
     Rover.dist_total1 = sum(Rover.dist1); 
 end

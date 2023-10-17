@@ -6,11 +6,12 @@ Rover.Width = 0.2488;
 Rover.n=2;
 % Rover.LoSRadius = Rover.n*Rover.Length;
 Rover.Radius = 0.5*norm([Rover.Length Rover.Width]);
-Rover.LoSRadius = Rover.n*(Rover.Length+Rover.Radius);
-% Rover.LoSRadius = Rover.n*(Rover.Radius);
+% Rover.LoSRadius = Rover.n*(Rover.Length+Rover.Radius);
+Rover.LoSRadius = Rover.n*(Rover.Length);
 Rover.RotationTheta = pi/2;
 Rover.Dimensions = RRTState.Dimensions;
 Rover.Obstacles = RRTState.Obstacles;
+Rover.StepSize =RRTState.StepSize;
 Rover.Kpu = 15;
 Rover.Kiu = 30;
 Rover.kdh = 0.05;
@@ -35,4 +36,16 @@ Rover.theta = 10;
 Rover.theta_rad = Rover.theta*pi/180;
 Rover.wpacc_ind = 0;
 Rover.obst =[];
+for j=1 : size(Rover.waypoints,1)
+    ind =0;
+            for i = 1:RRTState.Obstacles.Number
+            [d,~,~] = p_poly_dist(Rover.waypoints(j,1),Rover.waypoints(j,2), Rover.Obstacles.X(i,:), Rover.Obstacles.Y(i,:)); 
+            if d < 2*Rover.Radius 
+                ind = ind +1;
+
+            end
+
+            end
+              Rover.waypoints(j,3) = ind;
+end
 end

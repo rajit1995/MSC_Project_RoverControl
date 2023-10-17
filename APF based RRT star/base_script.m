@@ -1,5 +1,6 @@
 clc;
 clearvars;
+warning('off','MATLAB:polyshape:repairedBySimplify')
 rrtvariables;
 load("FieldConst.mat");
 Dimensions.Length = Length;
@@ -49,8 +50,8 @@ disp(['Average time taken :',num2str(Avg_time1)])
 disp(['Time taken by the Rover:',num2str(Avg_time2)])
 disp(['Distance covered by the Rover:',num2str(Avg_dist2)])
 %%
-openfig('APF_RRT_STAR1.fig')
-openfig('APF_RRT_STAR_RoverLoS1.fig')
+openfig('APF_RRT_STAR1.fig');
+openfig('APF_RRT_STAR_RoverLoS1.fig');
 
 
 
